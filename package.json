@@ -4,7 +4,8 @@
   "description": "A backend test for kobo",
   "main": "index.js",
   "scripts": {
-    "run:prod": "node dist/server.js"
+    "run:prod": "node dist/server.js",
+    "build": "tsc"
   },
   "author": "Panam",
   "license": "MIT",
