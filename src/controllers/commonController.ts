@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import catchAsync from '../utils';
+import {Types} from 'mongoose'
 
 const checkResource = async(Model: any, identifier: string): Promise<boolean> => {
     const resource: boolean = await Model.exists({ _id: identifier })
@@ -49,6 +50,7 @@ const getOne = (Model: any) => catchAsync(async (req: Request, res: Response, ne
 // Callback function to delete a resource from the DB
 const deleteOne = (Model: any) => catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const Id: string = req.params.Id;
+    console.log(Id)
 
     // Checking if the resource exists in the DB
     const resource: boolean = await checkResource(Model, Id)
@@ -105,11 +107,38 @@ const update = (Model: any, fields: Array<string>) => catchAsync(async (req: Req
     })
 })
 
+const checkIDTypeMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const Id: string = req.params.Id;
+    const movieId: string = req.body.movieId
+
+
+    if (Id) {
+        if (!Types.ObjectId.isValid(Id)) {
+            return res.status(400).json({
+                status: 'failed',
+                message: `Id passed - ${Id} is not a valid mongoDB ID`
+            })
+        }
+    }
+
+    if (movieId) {
+        if (!Types.ObjectId.isValid(movieId)) {
+            return res.status(400).json({
+                status: 'failed',
+                message: `movieId passed - ${movieId} is not a valid mongoDB ID`
+            })
+        }
+    }
+
+    next();
+} 
+
 
 export = {
     getAll,
     getOne,
     deleteOne,
     checkResource,
-    update
+    update,
+    checkIDTypeMiddleware
 }
